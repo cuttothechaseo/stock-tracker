@@ -28,6 +28,14 @@ interface StockChartProps {
   onTimeframeChange: (timeframe: string) => void;
 }
 
+interface TooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    value: number;
+  }>;
+  label?: string;
+}
+
 const timeframes = [
   { value: "1D", label: "1D" },
   { value: "5D", label: "5D" },
@@ -58,7 +66,7 @@ export function StockChart({
     }).format(price);
   };
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-background border border-border rounded-lg p-3 shadow-lg">

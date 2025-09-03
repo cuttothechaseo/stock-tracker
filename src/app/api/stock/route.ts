@@ -1,5 +1,23 @@
 import { NextResponse } from "next/server";
 
+interface PolygonDataItem {
+  t: number;
+  c: number;
+  o: number;
+  h: number;
+  l: number;
+  v: number;
+}
+
+interface PolygonResponse {
+  results: PolygonDataItem[];
+}
+
+interface ChartDataItem {
+  date: string;
+  price: number;
+}
+
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const symbol = searchParams.get("symbol") || "AAPL";
@@ -118,7 +136,7 @@ export async function GET(req: Request) {
       throw new Error(`Polygon API error: ${quoteResponse.status} - ${errorText}`);
     }
     
-    const quoteData = await quoteResponse.json();
+    const quoteData = await quoteResponse.json() as PolygonResponse;
     console.log("Quote data received:", !!quoteData);
     
     if (!quoteData.results || quoteData.results.length === 0) {
@@ -136,11 +154,11 @@ export async function GET(req: Request) {
     
     const historicalResponse = await fetch(historicalUrl);
     
-    let chartData = [];
+    let chartData: ChartDataItem[] = [];
     if (historicalResponse.ok) {
-      const historicalData = await historicalResponse.json();
+      const historicalData = await historicalResponse.json() as PolygonResponse;
       if (historicalData.results) {
-        chartData = historicalData.results.map((item: any) => ({
+        chartData = historicalData.results.map((item: PolygonDataItem) => ({
           date: new Date(item.t).toLocaleDateString('en-US', { 
             month: timeframe === "1D" ? undefined : 'short',
             day: timeframe === "1D" ? undefined : 'numeric',
